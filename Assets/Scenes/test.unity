@@ -141,10 +141,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   CellPrefab: {fileID: 1788552604305014, guid: f70f8f1a971c369489c41f956b2c8dca, type: 2}
-  ParentTransform: {fileID: 391564739}
+  ParentTransform: {fileID: 1821800976}
   StartPosition: {x: 0, y: 0}
-  TargetPosition: {x: 2, y: 1}
-  MapSize: {x: 5, y: 4}
+  TargetPosition: {x: 25, y: 11}
+  MapSize: {x: 35, y: 20}
   G: 0
 --- !u!4 &238705274
 Transform:

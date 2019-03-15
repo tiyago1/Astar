@@ -64,6 +64,14 @@ public class Cell : MonoBehaviour
         Position = position;
         PositionText.text = (int)position.x + ":" + (int)position.y;
         mImage = this.GetComponent<Image>();
+        this.gameObject.AddComponent<Button>().onClick.AddListener(SetWalkablity);
+
+    }
+
+    public void SetWalkablity()
+    {
+        IsWalkable = false;
+        SetColor(Color.gray);
     }
 
     public void SetColor(Color color)

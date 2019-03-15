@@ -52,7 +52,7 @@ public class Astar : MonoBehaviour
             StartCoroutine(PathFind());
         }
 
-        if (Input.GetKeyDown(KeyCode.Space))
+        if (Input.GetKeyDown(KeyCode.L))
         {
             StartCoroutine(Test());
         }
@@ -61,9 +61,10 @@ public class Astar : MonoBehaviour
     private IEnumerator Test()
     {
         Cell parentCell = ClosedList.First(it => it.Position == TargetPosition);
+        parentCell.SetColor(Color.black);
         do
         {
-            parentCell.SetColor(Color.blue);
+            parentCell.SetColor(Color.cyan);
             parentCell = parentCell.ParentCell;
 
         }
@@ -75,6 +76,7 @@ public class Astar : MonoBehaviour
     {
         Cell currentCell = AllCells.First(it => it.Position == StartPosition);
         OpenList.Add(currentCell);
+        yield return null;
         while (true)
         {
             if (ClosedList.Contains(AllCells.First(it => it.Position == TargetPosition)))
@@ -84,12 +86,12 @@ public class Astar : MonoBehaviour
             currentCell.SetColor(Color.red);
             ClosedList.Add(currentCell);
             OpenList.Remove(currentCell);
-            yield return new WaitForEndOfFrame();
+            //yield return new WaitForSeconds(0.3f);
             List<Cell> adjacentCells = GetAdjacentOfTheCell(currentCell);
-            G++;
 
             foreach (Cell adjacentCell in adjacentCells)
             {
+                //yield return new WaitForSeconds(1);
                 if (!adjacentCell.IsWalkable || ClosedList.Contains(adjacentCell))
                 {
                     continue;
@@ -97,20 +99,23 @@ public class Astar : MonoBehaviour
 
                 if (!OpenList.Contains(adjacentCell))
                 {
-                    adjacentCell.G = G;
-                    adjacentCell.H = ComputeHScore(currentCell.Position, adjacentCell.Position);
-                    adjacentCell.F = adjacentCell.G + adjacentCell.H;
                     adjacentCell.ParentCell = currentCell;
+
+                    adjacentCell.G = currentCell.G + 1;
+                    adjacentCell.H = ComputeHScore(adjacentCell.Position, TargetPosition);
+                    adjacentCell.F = adjacentCell.G + adjacentCell.H;
 
                     OpenList.Add(adjacentCell);
                 }
                 else
                 {
-                    if (G + adjacentCell.H < adjacentCell.F)
+                    if ((currentCell.G + 1) + adjacentCell.H < adjacentCell.F)
                     {
-                        adjacentCell.G = G;
+                        adjacentCell.G = currentCell.G + 1;
                         adjacentCell.F = adjacentCell.G + adjacentCell.H;
                         adjacentCell.ParentCell = currentCell;
+                        adjacentCell.SetColor(Color.green);
+                        OpenList.Add(adjacentCell);
                     }
                 }
             }
@@ -132,12 +137,12 @@ public class Astar : MonoBehaviour
         };
 
         adjacentOfTheCell.RemoveAll(it => it == null);
-      
+
         return adjacentOfTheCell;
     }
 
     static int ComputeHScore(Vector2 currentPosition, Vector2 targetPosition)
     {
-        return Math.Abs((int)targetPosition.x - (int)currentPosition.x) + Math.Abs((int)targetPosition.y - (int)currentPosition.y);
+        return (int)Vector2.Distance(currentPosition, targetPosition);
     }
 }
