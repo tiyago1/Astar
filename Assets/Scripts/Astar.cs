@@ -6,16 +6,10 @@ using UnityEngine;
 
 public class Astar : MonoBehaviour
 {
-
-    [Header("Junk")]
-    public GameObject CellPrefab;
-    public Transform ParentTransform;
-
     [Header("A*")]
     public Vector2 StartPosition;
     public Vector2 TargetPosition;
     public Vector2 MapSize;
-    public int G;
 
     private List<Cell> OpenList;
     private List<Cell> ClosedList;
@@ -37,11 +31,8 @@ public class Astar : MonoBehaviour
             {
                 for (int y = 0; y < MapSize.y; y++)
                 {
-                    GameObject cellObject = Instantiate(CellPrefab, ParentTransform);
-                    cellObject.GetComponent<RectTransform>().anchoredPosition = new Vector2(x * 50, y * 50);
-                    Cell cell = cellObject.GetComponent<Cell>();
-                    cell.Init(new Vector2(x, y));
-                    cell.IsWalkable = true;
+                    Cell cell = new Cell(new Vector2(x, y));
+                    cell.SetWalkablity(true);
                     AllCells.Add(cell);
                 }
             }
@@ -49,49 +40,46 @@ public class Astar : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.E))
         {
-            StartCoroutine(PathFind());
+            PathFind(StartPosition, TargetPosition);
         }
 
         if (Input.GetKeyDown(KeyCode.L))
         {
-            StartCoroutine(Test());
         }
     }
 
-    private IEnumerator Test()
+    private List<Cell> GetPath(Vector2 targetPosition)
     {
-        Cell parentCell = ClosedList.First(it => it.Position == TargetPosition);
-        parentCell.SetColor(Color.black);
+        List<Cell> path = new List<Cell>();
+        Cell parentCell = ClosedList.First(it => it.Position == targetPosition);
         do
         {
-            parentCell.SetColor(Color.cyan);
+            path.Add(parentCell);
             parentCell = parentCell.ParentCell;
-
         }
         while (parentCell != null);
-        yield return null;
+
+        return path;
     }
 
-    public IEnumerator PathFind()
+    public List<Cell> PathFind(Vector2 startPosition, Vector2 targetPosition)
     {
-        Cell currentCell = AllCells.First(it => it.Position == StartPosition);
+        Cell currentCell = AllCells.First(it => it.Position == startPosition);
         OpenList.Add(currentCell);
-        yield return null;
+
         while (true)
         {
-            if (ClosedList.Contains(AllCells.First(it => it.Position == TargetPosition)))
+            if (ClosedList.Contains(AllCells.First(it => it.Position == targetPosition)))
                 break;
-            double minFValue = OpenList.Min(it => it.F);
-            currentCell = OpenList.First(it => it.F == minFValue);
-            currentCell.SetColor(Color.red);
+
+            int f = OpenList.Min(it => it.F);
+            currentCell = OpenList.First(it => it.F == f);
             ClosedList.Add(currentCell);
             OpenList.Remove(currentCell);
-            //yield return new WaitForSeconds(0.3f);
             List<Cell> adjacentCells = GetAdjacentOfTheCell(currentCell);
 
             foreach (Cell adjacentCell in adjacentCells)
             {
-                //yield return new WaitForSeconds(1);
                 if (!adjacentCell.IsWalkable || ClosedList.Contains(adjacentCell))
                 {
                     continue;
@@ -102,7 +90,7 @@ public class Astar : MonoBehaviour
                     adjacentCell.ParentCell = currentCell;
 
                     adjacentCell.G = currentCell.G + 1;
-                    adjacentCell.H = ComputeHScore(adjacentCell.Position, TargetPosition);
+                    adjacentCell.H = ComputeHScore(adjacentCell.Position, targetPosition);
                     adjacentCell.F = adjacentCell.G + adjacentCell.H;
 
                     OpenList.Add(adjacentCell);
@@ -114,12 +102,13 @@ public class Astar : MonoBehaviour
                         adjacentCell.G = currentCell.G + 1;
                         adjacentCell.F = adjacentCell.G + adjacentCell.H;
                         adjacentCell.ParentCell = currentCell;
-                        adjacentCell.SetColor(Color.green);
                         OpenList.Add(adjacentCell);
                     }
                 }
             }
         }
+
+        return GetPath(targetPosition);
     }
 
     private List<Cell> GetAdjacentOfTheCell(Cell currentCell)

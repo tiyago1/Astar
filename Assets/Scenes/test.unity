@@ -140,12 +140,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f3c56cb42409f6e40845e68291c85517, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  CellPrefab: {fileID: 1788552604305014, guid: f70f8f1a971c369489c41f956b2c8dca, type: 2}
-  ParentTransform: {fileID: 1821800976}
   StartPosition: {x: 0, y: 0}
-  TargetPosition: {x: 25, y: 11}
-  MapSize: {x: 35, y: 20}
-  G: 0
+  TargetPosition: {x: 5, y: 5}
+  MapSize: {x: 10, y: 10}
 --- !u!4 &238705274
 Transform:
   m_ObjectHideFlags: 0
